@@ -21,6 +21,7 @@ export interface FoodListing {
   userName: string;
   createdAt: string;
   status: 'available' | 'reserved' | 'completed';
+  dietaryTags?: string[];
 }
 
 export interface AuthContextType {

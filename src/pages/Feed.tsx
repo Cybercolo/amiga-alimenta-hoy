@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,6 +41,7 @@ const Feed = () => {
           expirationDate: '2024-06-27',
           address: 'Las Condes, Santiago',
           image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=300&fit=crop',
+          dietaryTags: ['vegano', 'libre-gluten'],
           userId: '2',
           userName: 'María González',
           createdAt: '2024-06-25T10:00:00Z',
@@ -56,6 +56,7 @@ const Feed = () => {
           expirationDate: '2024-06-26',
           address: 'Providencia, Santiago',
           image: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&h=300&fit=crop',
+          dietaryTags: ['vegetariano'],
           userId: '3',
           userName: 'Panadería El Trigal',
           createdAt: '2024-06-25T08:30:00Z',
@@ -138,6 +139,32 @@ const Feed = () => {
       return <Badge className="bg-yellow-400 hover:bg-yellow-500">{days} días</Badge>;
     } else {
       return <Badge variant="secondary">{days} días</Badge>;
+    }
+  };
+
+  const getDietaryTagColor = (tag: string) => {
+    switch (tag) {
+      case 'vegano':
+        return 'bg-green-500 text-white';
+      case 'vegetariano':
+        return 'bg-green-400 text-white';
+      case 'libre-gluten':
+        return 'bg-orange-500 text-white';
+      default:
+        return 'bg-gray-500 text-white';
+    }
+  };
+
+  const getDietaryTagLabel = (tag: string) => {
+    switch (tag) {
+      case 'vegano':
+        return 'Vegano';
+      case 'vegetariano':
+        return 'Vegetariano';
+      case 'libre-gluten':
+        return 'Libre de Gluten';
+      default:
+        return tag;
     }
   };
 
@@ -230,6 +257,19 @@ const Feed = () => {
                         alt={listing.title}
                         className="w-full h-full object-cover"
                       />
+                      {/* Dietary tags overlay */}
+                      {listing.dietaryTags && listing.dietaryTags.length > 0 && (
+                        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                          {listing.dietaryTags.map((tag) => (
+                            <Badge 
+                              key={tag} 
+                              className={`text-xs px-2 py-1 rounded-full ${getDietaryTagColor(tag)}`}
+                            >
+                              {getDietaryTagLabel(tag)}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                   
@@ -254,6 +294,20 @@ const Feed = () => {
                         {listing.quantity}
                       </span>
                     </div>
+
+                    {/* Dietary tags for listings without images */}
+                    {!listing.image && listing.dietaryTags && listing.dietaryTags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {listing.dietaryTags.map((tag) => (
+                          <Badge 
+                            key={tag} 
+                            className={`text-xs px-2 py-1 rounded-full ${getDietaryTagColor(tag)}`}
+                          >
+                            {getDietaryTagLabel(tag)}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex items-center">

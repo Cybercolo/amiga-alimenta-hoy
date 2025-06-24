@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { FoodListing } from '@/types';
@@ -22,6 +22,7 @@ const PublicarComida = () => {
     address: ''
   });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [dietaryTags, setDietaryTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -45,6 +46,14 @@ const PublicarComida = () => {
 
   const removeImage = () => {
     setSelectedImage(null);
+  };
+
+  const handleDietaryTagChange = (tag: string, checked: boolean) => {
+    if (checked) {
+      setDietaryTags([...dietaryTags, tag]);
+    } else {
+      setDietaryTags(dietaryTags.filter(t => t !== tag));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,6 +83,7 @@ const PublicarComida = () => {
         expirationDate: formData.expirationDate,
         address: formData.address,
         image: selectedImage || undefined,
+        dietaryTags: dietaryTags.length > 0 ? dietaryTags : undefined,
         userId: user.id,
         userName: user.name,
         createdAt: new Date().toISOString(),
@@ -110,6 +120,12 @@ const PublicarComida = () => {
     'Comida Preparada',
     'Conservas',
     'Otros'
+  ];
+
+  const dietaryOptions = [
+    { id: 'vegetariano', label: 'Vegetariano' },
+    { id: 'vegano', label: 'Vegano' },
+    { id: 'libre-gluten', label: 'Libre de Gluten' }
   ];
 
   return (
@@ -201,6 +217,24 @@ const PublicarComida = () => {
                   required
                   className="border-green-200 focus:border-green-500"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Características dietarias (opcional)</Label>
+                <div className="grid grid-cols-1 gap-3">
+                  {dietaryOptions.map((option) => (
+                    <div key={option.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={option.id}
+                        checked={dietaryTags.includes(option.id)}
+                        onCheckedChange={(checked) => handleDietaryTagChange(option.id, checked as boolean)}
+                      />
+                      <Label htmlFor={option.id} className="text-sm font-normal">
+                        {option.label}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">
