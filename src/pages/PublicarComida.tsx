@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { FoodListing } from '@/types';
-import { Loader2, Camera } from 'lucide-react';
+import { Loader2, Camera, X } from 'lucide-react';
 
 const PublicarComida = () => {
   const [formData, setFormData] = useState({
@@ -19,10 +19,9 @@ const PublicarComida = () => {
     category: '',
     quantity: '',
     expirationDate: '',
-    address: '',
-    latitude: '',
-    longitude: ''
+    address: ''
   });
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -32,6 +31,21 @@ const PublicarComida = () => {
     navigate('/login');
     return null;
   }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSelectedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,8 +73,7 @@ const PublicarComida = () => {
         quantity: formData.quantity,
         expirationDate: formData.expirationDate,
         address: formData.address,
-        latitude: formData.latitude ? parseFloat(formData.latitude) : undefined,
-        longitude: formData.longitude ? parseFloat(formData.longitude) : undefined,
+        image: selectedImage || undefined,
         userId: user.id,
         userName: user.name,
         createdAt: new Date().toISOString(),
@@ -190,40 +203,43 @@ const PublicarComida = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="latitude">Latitud (opcional)</Label>
-                  <Input
-                    id="latitude"
-                    type="number"
-                    step="any"
-                    value={formData.latitude}
-                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                    placeholder="-33.4489"
-                    className="border-green-200 focus:border-green-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="longitude">Longitud (opcional)</Label>
-                  <Input
-                    id="longitude"
-                    type="number"
-                    step="any"
-                    value={formData.longitude}
-                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                    placeholder="-70.6693"
-                    className="border-green-200 focus:border-green-500"
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <Label>Foto (próximamente)</Label>
-                <div className="border-2 border-dashed border-green-200 rounded-lg p-8 text-center">
-                  <Camera className="w-12 h-12 text-green-400 mx-auto mb-4" />
-                  <p className="text-gray-500">La función de fotos estará disponible pronto</p>
-                </div>
+                <Label>Foto del alimento</Label>
+                {!selectedImage ? (
+                  <div className="border-2 border-dashed border-green-200 rounded-lg p-8 text-center">
+                    <Camera className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">Sube una foto del alimento que quieres compartir</p>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <Label htmlFor="image-upload" className="cursor-pointer">
+                      <Button type="button" variant="outline" className="border-green-300 text-green-700 hover:bg-green-50" asChild>
+                        <span>Seleccionar imagen</span>
+                      </Button>
+                    </Label>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <img 
+                      src={selectedImage} 
+                      alt="Vista previa del alimento" 
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={removeImage}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <Button
