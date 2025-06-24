@@ -8,12 +8,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FoodListing } from '@/types';
 import { MapPin, Calendar, User, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import FoodDetailModal from '@/components/FoodDetailModal';
 
 const Feed = () => {
   const [listings, setListings] = useState<FoodListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<FoodListing[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedListing, setSelectedListing] = useState<FoodListing | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -140,129 +143,144 @@ const Feed = () => {
     }
   };
 
+  const handleInterested = (listing: FoodListing) => {
+    setSelectedListing(listing);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedListing(null);
+  };
+
   if (!user) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-yellow-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-green-800 mb-2">Comida Disponible</h1>
-          <p className="text-gray-600">Descubre comida cerca de ti y ayuda a reducir el desperdicio</p>
-        </div>
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-yellow-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-green-800 mb-2">Comida Disponible</h1>
+            <p className="text-gray-600">Descubre comida cerca de ti y ayuda a reducir el desperdicio</p>
+          </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar por título, descripción o ubicación..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-green-200 focus:border-green-500"
-                />
+          {/* Filters */}
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Buscar por título, descripción o ubicación..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 border-green-200 focus:border-green-500"
+                  />
+                </div>
+              </div>
+              <div className="md:w-48">
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="border-green-200 focus:border-green-500">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <div className="md:w-48">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="border-green-200 focus:border-green-500">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder="Categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas las categorías</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
+
+          {/* Listings Grid */}
+          {filteredListings.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-12 h-12 text-green-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                {listings.length === 0 ? 'No hay comida publicada aún' : 'No se encontraron resultados'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {listings.length === 0 
+                  ? 'Sé el primero en compartir comida con tu comunidad'
+                  : 'Intenta con otros términos de búsqueda o filtros'}
+              </p>
+              <Button 
+                onClick={() => navigate('/publicar')}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Publicar Comida
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredListings.map((listing) => (
+                <Card key={listing.id} className="hover:shadow-lg transition-shadow border-green-200">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg text-green-800 line-clamp-2">
+                        {listing.title}
+                      </CardTitle>
+                      {getExpirationBadge(listing.expirationDate)}
+                    </div>
+                    <CardDescription className="line-clamp-3">
+                      {listing.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <Badge variant="outline" className="border-green-300 text-green-700">
+                        {listing.category}
+                      </Badge>
+                      <span className="text-sm font-medium text-gray-700">
+                        {listing.quantity}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-2 text-green-600" />
+                        {listing.address}
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-green-600" />
+                        Vence: {formatDate(listing.expirationDate)}
+                      </div>
+                      <div className="flex items-center">
+                        <User className="w-4 h-4 mr-2 text-green-600" />
+                        {listing.userName}
+                      </div>
+                    </div>
+
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700 mt-4"
+                      onClick={() => handleInterested(listing)}
+                    >
+                      Estoy Interesado
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* Listings Grid */}
-        {filteredListings.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-12 h-12 text-green-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              {listings.length === 0 ? 'No hay comida publicada aún' : 'No se encontraron resultados'}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {listings.length === 0 
-                ? 'Sé el primero en compartir comida con tu comunidad'
-                : 'Intenta con otros términos de búsqueda o filtros'}
-            </p>
-            <Button 
-              onClick={() => navigate('/publicar')}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Publicar Comida
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredListings.map((listing) => (
-              <Card key={listing.id} className="hover:shadow-lg transition-shadow border-green-200">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg text-green-800 line-clamp-2">
-                      {listing.title}
-                    </CardTitle>
-                    {getExpirationBadge(listing.expirationDate)}
-                  </div>
-                  <CardDescription className="line-clamp-3">
-                    {listing.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <Badge variant="outline" className="border-green-300 text-green-700">
-                      {listing.category}
-                    </Badge>
-                    <span className="text-sm font-medium text-gray-700">
-                      {listing.quantity}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-2 text-green-600" />
-                      {listing.address}
-                    </div>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-green-600" />
-                      Vence: {formatDate(listing.expirationDate)}
-                    </div>
-                    <div className="flex items-center">
-                      <User className="w-4 h-4 mr-2 text-green-600" />
-                      {listing.userName}
-                    </div>
-                  </div>
-
-                  <Button 
-                    className="w-full bg-green-600 hover:bg-green-700 mt-4"
-                    onClick={() => {
-                      // For now, just show a toast. In a real app, this would open a contact modal
-                      alert(`¡Interesado en "${listing.title}"! En una versión completa, aquí podrías contactar a ${listing.userName}.`);
-                    }}
-                  >
-                    Estoy Interesado
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
       </div>
-    </div>
+
+      <FoodDetailModal 
+        listing={selectedListing}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
+    </>
   );
 };
 
