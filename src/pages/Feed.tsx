@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ const Feed = () => {
   const [listings, setListings] = useState<FoodListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<FoodListing[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -95,7 +94,7 @@ const Feed = () => {
       );
     }
 
-    if (categoryFilter) {
+    if (categoryFilter && categoryFilter !== 'all') {
       filtered = filtered.filter(listing => listing.category === categoryFilter);
     }
 
@@ -175,7 +174,7 @@ const Feed = () => {
                   <SelectValue placeholder="Categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas las categorías</SelectItem>
+                  <SelectItem value="all">Todas las categorías</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
