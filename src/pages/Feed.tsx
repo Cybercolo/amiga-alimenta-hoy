@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { FoodListing } from '@/types';
-import { MapPin, Calendar, User, Search, Filter } from 'lucide-react';
+import { MapPin, Calendar, User, Search, Filter, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FoodDetailModal from '@/components/FoodDetailModal';
 
@@ -40,8 +41,7 @@ const Feed = () => {
           quantity: '3 kg aprox',
           expirationDate: '2024-06-27',
           address: 'Las Condes, Santiago',
-          latitude: -33.4172,
-          longitude: -70.6036,
+          image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=300&fit=crop',
           userId: '2',
           userName: 'María González',
           createdAt: '2024-06-25T10:00:00Z',
@@ -55,8 +55,7 @@ const Feed = () => {
           quantity: '20 unidades',
           expirationDate: '2024-06-26',
           address: 'Providencia, Santiago',
-          latitude: -33.4378,
-          longitude: -70.6504,
+          image: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&h=300&fit=crop',
           userId: '3',
           userName: 'Panadería El Trigal',
           createdAt: '2024-06-25T08:30:00Z',
@@ -70,8 +69,7 @@ const Feed = () => {
           quantity: '2 kg',
           expirationDate: '2024-06-26',
           address: 'Ñuñoa, Santiago',
-          latitude: -33.4569,
-          longitude: -70.5959,
+          image: 'https://images.unsplash.com/photo-1466721591366-2d5fba72006d?w=400&h=300&fit=crop',
           userId: '4',
           userName: 'Carlos Mendoza',
           createdAt: '2024-06-24T16:20:00Z',
@@ -225,7 +223,17 @@ const Feed = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredListings.map((listing) => (
                 <Card key={listing.id} className="hover:shadow-lg transition-shadow border-green-200">
-                  <CardHeader>
+                  {listing.image && (
+                    <div className="relative w-full h-32 overflow-hidden rounded-t-lg">
+                      <img 
+                        src={listing.image} 
+                        alt={listing.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  <CardHeader className={listing.image ? "pb-2" : ""}>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg text-green-800 line-clamp-2">
                         {listing.title}
@@ -236,6 +244,7 @@ const Feed = () => {
                       {listing.description}
                     </CardDescription>
                   </CardHeader>
+                  
                   <CardContent className="space-y-3">
                     <div className="flex justify-between items-center">
                       <Badge variant="outline" className="border-green-300 text-green-700">
