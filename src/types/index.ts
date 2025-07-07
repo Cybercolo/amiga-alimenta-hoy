@@ -1,8 +1,17 @@
+
 export interface User {
   id: string;
   name: string;
   email: string;
   type: 'user' | 'business';
+}
+
+export interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string, name: string, type: User['type']) => Promise<boolean>;
+  logout: () => void;
+  isLoading: boolean;
 }
 
 export interface FoodListing {

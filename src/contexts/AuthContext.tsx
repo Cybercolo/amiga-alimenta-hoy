@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: '1',
         email,
         name: email.split('@')[0],
-        type: 'individual'
+        type: 'user'
       };
       
       setUser(mockUser);

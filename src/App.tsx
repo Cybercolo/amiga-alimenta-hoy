@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
-import Publicar from './pages/Publicar';
+import PublicarComida from './pages/PublicarComida';
 import MisReservas from './pages/MisReservas';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -23,7 +24,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/feed" element={<Feed />} />
-              <Route path="/publicar" element={<Publicar />} />
+              <Route path="/publicar" element={<PublicarComida />} />
               <Route path="/mis-reservas" element={<MisReservas />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
