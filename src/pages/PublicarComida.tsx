@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { FoodListing } from '@/types';
-import { Loader2, Camera, X } from 'lucide-react';
+import { Loader2, Camera, X, Users, Scale } from 'lucide-react';
 
 const PublicarComida = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ const PublicarComida = () => {
     description: '',
     category: '',
     quantity: '',
+    totalPortions: '',
+    portionSize: 'normal',
     expirationDate: '',
     address: ''
   });
@@ -80,6 +83,8 @@ const PublicarComida = () => {
         description: formData.description,
         category: formData.category,
         quantity: formData.quantity,
+        totalPortions: formData.totalPortions ? parseInt(formData.totalPortions) : undefined,
+        availablePortions: formData.totalPortions ? parseInt(formData.totalPortions) : undefined,
         expirationDate: formData.expirationDate,
         address: formData.address,
         image: selectedImage || undefined,
@@ -126,6 +131,13 @@ const PublicarComida = () => {
     { id: 'vegetariano', label: 'Vegetariano' },
     { id: 'vegano', label: 'Vegano' },
     { id: 'libre-gluten', label: 'Libre de Gluten' }
+  ];
+
+  const portionSizes = [
+    { value: 'small', label: 'Pequeñas (1 persona)' },
+    { value: 'normal', label: 'Normales (1-2 personas)' },
+    { value: 'large', label: 'Grandes (familia/grupo)' },
+    { value: 'bulk', label: 'A granel (mucha cantidad)' }
   ];
 
   return (
@@ -192,6 +204,57 @@ const PublicarComida = () => {
                     required
                     className="border-green-200 focus:border-green-500"
                   />
+                </div>
+              </div>
+
+              {/* New portion management section */}
+              <div className="bg-green-50 p-4 rounded-lg space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Users className="w-5 h-5 text-green-600" />
+                  <Label className="text-base font-medium text-green-800">Gestión de Porciones</Label>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="totalPortions">¿Cuántas porciones tienes? (opcional)</Label>
+                    <Input
+                      id="totalPortions"
+                      type="number"
+                      min="1"
+                      value={formData.totalPortions}
+                      onChange={(e) => setFormData({ ...formData, totalPortions: e.target.value })}
+                      placeholder="ej. 10"
+                      className="border-green-200 focus:border-green-500"
+                    />
+                    <p className="text-xs text-gray-600">Número aproximado de personas que podrían alimentarse</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="portionSize">Tamaño de porción</Label>
+                    <Select value={formData.portionSize} onValueChange={(value) => setFormData({ ...formData, portionSize: value })}>
+                      <SelectTrigger className="border-green-200 focus:border-green-500">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {portionSizes.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                            <div className="flex items-center space-x-2">
+                              <Scale className="w-4 h-4" />
+                              <span>{size.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-600">¿Para cuántas personas es cada porción aproximadamente?</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-3 rounded border border-green-200">
+                  <p className="text-sm text-green-700">
+                    <strong>💡 Ejemplo:</strong> Si tienes 20 panes y cada uno alimenta a 1 persona, pon "20" en porciones y selecciona "Pequeñas".
+                    Si tienes 5 bolsas grandes de verduras y cada bolsa alimenta a una familia, pon "5" y selecciona "Grandes".
+                  </p>
                 </div>
               </div>
 

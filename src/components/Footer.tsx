@@ -1,10 +1,38 @@
 
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Footer = () => {
   return (
     <footer className="bg-green-50 border-t border-green-100 mt-auto">
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Donation Banner */}
+        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 mb-8 text-center">
+          <div className="flex items-center justify-center space-x-2 mb-3">
+            <Heart className="w-6 h-6 text-red-400 fill-current" />
+            <h3 className="text-xl font-bold text-white">Ayúdanos a mantener Ni Una Miga</h3>
+          </div>
+          <p className="text-green-100 mb-4 max-w-2xl mx-auto">
+            Somos una plataforma 100% gratuita que conecta personas para reducir el desperdicio de alimentos. 
+            Tu donación nos ayuda a mantener el proyecto funcionando y crecer.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button 
+              className="bg-yellow-500 hover:bg-yellow-600 text-green-800 font-semibold"
+              onClick={() => window.open('https://paypal.me/niunamiga', '_blank')}
+            >
+              Donar con PayPal
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-white text-white hover:bg-white hover:text-green-700"
+              onClick={() => window.open('https://mercadopago.com/niunamiga', '_blank')}
+            >
+              Donar con MercadoPago
+            </Button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Mission */}
           <div className="space-y-4">
@@ -15,7 +43,7 @@ const Footer = () => {
               <span className="text-xl font-bold text-green-700">Ni Una Miga</span>
             </div>
             <p className="text-gray-600 text-sm">
-              Reduciendo el desperdicio de alimentos y ayudando a nuestras comunidades en toda Latinoamérica.
+              Reduciendo el desperdicio de alimentos y ayudando a nuestras comunidades en todo Chile.
             </p>
           </div>
 
