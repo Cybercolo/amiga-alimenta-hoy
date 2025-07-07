@@ -3,7 +3,23 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, LogOut, Plus, Home, List } from 'lucide-react';
+import { Menu, X, LogOut, Plus, Home, List, Building2 } from 'lucide-react';
+
+const BreadLogo = () => (
+  <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center relative">
+    {/* Bread shape */}
+    <div className="w-6 h-5 bg-gradient-to-b from-amber-300 to-amber-500 rounded-full relative">
+      {/* Eyes */}
+      <div className="absolute top-1 left-1 w-1 h-1 bg-amber-800 rounded-full"></div>
+      <div className="absolute top-1 right-1 w-1 h-1 bg-amber-800 rounded-full"></div>
+      {/* Smile */}
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-2 h-1 border-b border-amber-800 rounded-full"></div>
+      {/* Bread lines */}
+      <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-3 h-0.5 bg-amber-600 rounded-full opacity-50"></div>
+      <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-2 h-0.5 bg-amber-600 rounded-full opacity-50"></div>
+    </div>
+  </div>
+);
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,9 +38,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-yellow-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">NM</span>
-            </div>
+            <BreadLogo />
             <span className="text-2xl font-bold text-green-700">Ni Una Miga</span>
           </Link>
 
@@ -40,6 +54,12 @@ const Navbar = () => {
                   <Plus className="w-4 h-4" />
                   <span>Publicar</span>
                 </Link>
+                {user.type === 'business' && (
+                  <Link to="/dashboard-empresas" className="text-gray-700 hover:text-green-600 flex items-center space-x-1">
+                    <Building2 className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                )}
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-600">Hola, {user.name}</span>
                   <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-700 hover:text-red-600">
@@ -94,6 +114,16 @@ const Navbar = () => {
                   <Plus className="w-4 h-4" />
                   <span>Publicar</span>
                 </Link>
+                {user.type === 'business' && (
+                  <Link
+                    to="/dashboard-empresas"
+                    className="block px-3 py-2 text-gray-700 hover:text-green-600 flex items-center space-x-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Building2 className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                )}
                 <div className="px-3 py-2 text-sm text-gray-600 border-t border-green-100 mt-3 pt-3">
                   Hola, {user.name}
                 </div>

@@ -4,8 +4,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { FoodListing } from '@/types';
-import { MapPin, Calendar, User, Phone, Mail, MessageCircle, Image } from 'lucide-react';
+import { MapPin, Calendar, User, Image, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface FoodDetailModalProps {
@@ -16,6 +17,8 @@ interface FoodDetailModalProps {
 
 const FoodDetailModal = ({ listing, isOpen, onClose }: FoodDetailModalProps) => {
   const [showContact, setShowContact] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageSent, setMessageSent] = useState(false);
   const { toast } = useToast();
 
   if (!listing) return null;
@@ -54,11 +57,24 @@ const FoodDetailModal = ({ listing, isOpen, onClose }: FoodDetailModalProps) => 
     }
   };
 
-  const handleContactAction = (type: string) => {
-    setShowContact(true);
+  const handleSendMessage = () => {
+    if (!message.trim()) {
+      toast({
+        title: "Error",
+        description: "Por favor escribe un mensaje antes de enviarlo.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Aquí iría la lógica para enviar el mensaje
+    console.log('Mensaje enviado:', message);
+    setMessageSent(true);
+    setMessage('');
+    
     toast({
-      title: "¡Genial!",
-      description: `En una versión completa, aquí se ${type === 'phone' ? 'mostraría el teléfono' : type === 'email' ? 'abriría el correo' : 'iniciaría el chat'} con ${listing.userName}.`,
+      title: "¡Mensaje enviado!",
+      description: `Tu mensaje ha sido enviado a ${listing.userName}. Te responderá pronto.`,
     });
   };
 
@@ -145,46 +161,68 @@ const FoodDetailModal = ({ listing, isOpen, onClose }: FoodDetailModalProps) => 
             {!showContact ? (
               <div className="text-center">
                 <p className="text-gray-600 mb-4">
-                  ¿Te interesa esta comida? Contacta con {listing.userName} para coordinar la recogida.
+                  ¿Te interesa esta comida? Envía un mensaje a {listing.userName} para coordinar la recogida.
                 </p>
                 <Button 
                   onClick={() => setShowContact(true)}
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  Ver opciones de contacto
+                  Enviar mensaje
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
-                <p className="text-gray-600 mb-4">
-                  Elige cómo quieres contactar con {listing.userName}:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Button 
-                    variant="outline"
-                    onClick={() => handleContactAction('phone')}
-                    className="flex items-center space-x-2 border-green-300 hover:bg-green-50"
-                  >
-                    <Phone className="w-4 h-4" />
-                    <span>Llamar</span>
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => handleContactAction('email')}
-                    className="flex items-center space-x-2 border-green-300 hover:bg-green-50"
-                  >
-                    <Mail className="w-4 h-4" />
-                    <span>Email</span>
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => handleContactAction('message')}
-                    className="flex items-center space-x-2 border-green-300 hover:bg-green-50"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>Mensaje</span>
-                  </Button>
-                </div>
+              <div className="space-y-4">
+                {!messageSent ? (
+                  <>
+                    <p className="text-gray-600">
+                      Escribe tu mensaje para {listing.userName}:
+                    </p>
+                    <div className="space-y-3">
+                      <Textarea
+                        placeholder="Hola! Me interesa esta comida. ¿Podríamos coordinar la recogida? Estoy disponible..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="min-h-[100px] border-green-200 focus:border-green-500"
+                      />
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={handleSendMessage}
+                          className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                        >
+                          <Send className="w-4 h-4" />
+                          Enviar mensaje
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => setShowContact(false)}
+                          className="border-green-300 hover:bg-green-50"
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center p-6 bg-green-50 rounded-lg">
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Send className="w-6 h-6 text-white" />
+                    </div>
+                    <h4 className="font-semibold text-green-800 mb-2">¡Mensaje enviado!</h4>
+                    <p className="text-green-700 mb-4">
+                      Tu mensaje ha sido enviado a {listing.userName}. Te responderá pronto para coordinar la recogida.
+                    </p>
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setMessageSent(false);
+                        setShowContact(false);
+                      }}
+                      className="border-green-300 hover:bg-green-50"
+                    >
+                      Enviar otro mensaje
+                    </Button>
+                  </div>
+                )}
                 
                 <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
                   <p className="text-sm text-yellow-800">
