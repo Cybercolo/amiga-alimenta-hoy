@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import PublicarComida from "./pages/PublicarComida";
 import Feed from "./pages/Feed";
 import DashboardEmpresas from "./pages/DashboardEmpresas";
+import MisReservas from "./pages/MisReservas";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
                 <Route path="/publicar" element={<PublicarComida />} />
                 <Route path="/feed" element={<Feed />} />
                 <Route path="/dashboard-empresas" element={<DashboardEmpresas />} />
+                <Route path="/mis-reservas" element={<MisReservas />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

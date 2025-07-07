@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,13 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/contexts/AuthContext';
-import { FoodListing } from '@/types';
-import { Plus, TrendingUp, Package, Clock, Eye, Edit, Trash2, Calendar, MapPin } from 'lucide-react';
+import { FoodListing, Reservation } from '@/types';
+import { Plus, TrendingUp, Package, Clock, Edit, Trash2, Calendar, MapPin, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const DashboardEmpresas = () => {
   const [listings, setListings] = useState<FoodListing[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [filteredListings, setFilteredListings] = useState<FoodListing[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -36,6 +36,14 @@ const DashboardEmpresas = () => {
     const storedListings = JSON.parse(localStorage.getItem('niunamiga_listings') || '[]');
     const userListings = storedListings.filter((listing: FoodListing) => listing.userId === user.id);
     setListings(userListings);
+
+    // Load reservations for user's listings
+    const storedReservations = JSON.parse(localStorage.getItem('niunamiga_reservations') || '[]');
+    const userListingIds = userListings.map((l: FoodListing) => l.id);
+    const relatedReservations = storedReservations.filter((reservation: Reservation) => 
+      userListingIds.includes(reservation.listingId)
+    );
+    setReservations(relatedReservations);
   }, [user, navigate]);
 
   useEffect(() => {
@@ -105,6 +113,31 @@ const DashboardEmpresas = () => {
     });
   };
 
+  const handleConfirmReservation = (reservationId: string) => {
+    const storedReservations = JSON.parse(localStorage.getItem('niunamiga_reservations') || '[]');
+    const updatedReservations = storedReservations.map((reservation: Reservation) => 
+      reservation.id === reservationId ? { ...reservation, status: 'confirmed' } : reservation
+    );
+    localStorage.setItem('niunamiga_reservations', JSON.stringify(updatedReservations));
+    
+    setReservations(prev => prev.map(reservation => 
+      reservation.id === reservationId ? { ...reservation, status: 'confirmed' } : reservation
+    ));
+    
+    toast({
+      title: "Reserva confirmada",
+      description: "La reserva ha sido confirmada. El usuario podrá proceder con la recogida.",
+    });
+  };
+
+  const getReservationStats = () => {
+    const pending = reservations.filter(r => r.status === 'pending').length;
+    const confirmed = reservations.filter(r => r.status === 'confirmed').length;
+    const completed = reservations.filter(r => r.status === 'completed').length;
+    
+    return { pending, confirmed, completed, total: reservations.length };
+  };
+
   const getStats = () => {
     const available = listings.filter(l => l.status === 'available').length;
     const reserved = listings.filter(l => l.status === 'reserved').length;
@@ -114,6 +147,7 @@ const DashboardEmpresas = () => {
   };
 
   const stats = getStats();
+  const reservationStats = getReservationStats();
 
   if (!user || user.type !== 'business') {
     return null;
@@ -129,7 +163,7 @@ const DashboardEmpresas = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Publicaciones</CardTitle>
@@ -149,27 +183,97 @@ const DashboardEmpresas = () => {
               <div className="text-2xl font-bold text-green-500">{stats.available}</div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Reservas</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{reservationStats.total}</div>
+            </CardContent>
+          </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Reservados</CardTitle>
+              <CardTitle className="text-sm font-medium">Pendientes</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-500">{stats.reserved}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completados</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-500">{stats.completed}</div>
+              <div className="text-2xl font-bold text-yellow-500">{reservationStats.pending}</div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Reservations Section */}
+        {reservations.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Reservas Recientes</CardTitle>
+              <CardDescription>
+                Gestiona las reservas de tus publicaciones
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Publicación</TableHead>
+                      <TableHead>Reservado por</TableHead>
+                      <TableHead>Porciones</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead>Fecha Reserva</TableHead>
+                      <TableHead>Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reservations.slice(0, 5).map((reservation) => (
+                      <TableRow key={reservation.id}>
+                        <TableCell className="font-medium">
+                          {reservation.listingTitle}
+                        </TableCell>
+                        <TableCell>{reservation.reservedByName}</TableCell>
+                        <TableCell>
+                          <Badge className="bg-blue-500 hover:bg-blue-600">
+                            {reservation.portionsReserved}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {reservation.status === 'pending' && (
+                            <Badge className="bg-yellow-500 hover:bg-yellow-600">Pendiente</Badge>
+                          )}
+                          {reservation.status === 'confirmed' && (
+                            <Badge className="bg-blue-500 hover:bg-blue-600">Confirmado</Badge>
+                          )}
+                          {reservation.status === 'completed' && (
+                            <Badge className="bg-green-500 hover:bg-green-600">Completado</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-gray-600">
+                            {formatDate(reservation.reservationDate)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {reservation.status === 'pending' && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleConfirmReservation(reservation.id)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Confirmar
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Actions and Filters */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -239,6 +343,7 @@ const DashboardEmpresas = () => {
                       <TableHead>Título</TableHead>
                       <TableHead>Categoría</TableHead>
                       <TableHead>Cantidad</TableHead>
+                      <TableHead>Porciones</TableHead>
                       <TableHead>Vencimiento</TableHead>
                       <TableHead>Estado</TableHead>
                       <TableHead>Fecha Publicación</TableHead>
@@ -258,6 +363,9 @@ const DashboardEmpresas = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>{listing.quantity}</TableCell>
+                         <TableCell>
+                          {listing.totalPortions ? listing.availablePortions !== undefined ? `${listing.availablePortions}/${listing.totalPortions}` : listing.totalPortions : 'N/A'}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center text-sm">
                             <Calendar className="w-4 h-4 mr-1 text-gray-400" />

@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, LogOut, Plus, Home, List, Building2 } from 'lucide-react';
+import { Menu, X, LogOut, Plus, Home, List, Building2, Package } from 'lucide-react';
 
 const BreadLogo = () => (
   <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center relative">
@@ -54,6 +53,12 @@ const Navbar = () => {
                   <Plus className="w-4 h-4" />
                   <span>Publicar</span>
                 </Link>
+                {user.type === 'individual' && (
+                  <Link to="/mis-reservas" className="text-gray-700 hover:text-green-600 flex items-center space-x-1">
+                    <Package className="w-4 h-4" />
+                    <span>Mis Reservas</span>
+                  </Link>
+                )}
                 {user.type === 'business' && (
                   <Link to="/dashboard-empresas" className="text-gray-700 hover:text-green-600 flex items-center space-x-1">
                     <Building2 className="w-4 h-4" />
@@ -114,6 +119,16 @@ const Navbar = () => {
                   <Plus className="w-4 h-4" />
                   <span>Publicar</span>
                 </Link>
+                {user.type === 'individual' && (
+                  <Link
+                    to="/mis-reservas"
+                    className="block px-3 py-2 text-gray-700 hover:text-green-600 flex items-center space-x-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Package className="w-4 h-4" />
+                    <span>Mis Reservas</span>
+                  </Link>
+                )}
                 {user.type === 'business' && (
                   <Link
                     to="/dashboard-empresas"
