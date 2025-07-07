@@ -25,7 +25,7 @@ const Footer = () => {
             </Button>
             <Button 
               variant="outline" 
-              className="border-white text-white hover:bg-white hover:text-green-700"
+              className="border-white text-green-800 bg-white hover:bg-gray-100 hover:text-green-800 font-semibold"
               onClick={() => window.open('https://mercadopago.com/niunamiga', '_blank')}
             >
               Donar con MercadoPago

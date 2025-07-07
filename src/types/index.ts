@@ -1,9 +1,8 @@
-
 export interface User {
   id: string;
-  email: string;
   name: string;
-  type: 'individual' | 'business' | 'ngo';
+  email: string;
+  type: 'user' | 'business';
 }
 
 export interface FoodListing {
@@ -12,20 +11,66 @@ export interface FoodListing {
   description: string;
   category: string;
   quantity: string;
-  totalPortions?: number; // Nueva propiedad para cantidad numérica
-  availablePortions?: number; // Porciones disponibles
   expirationDate: string;
   address: string;
-  latitude?: number;
-  longitude?: number;
   image?: string;
+  dietaryTags?: string[];
   userId: string;
   userName: string;
   createdAt: string;
   status: 'available' | 'reserved' | 'completed';
-  dietaryTags?: string[];
 }
 
+export interface Reservation {
+  id: string;
+  listingId: string;
+  reservedBy: string;
+  portionsReserved: number;
+  reservationDate: string;
+  pickupAddress: string;
+  expirationDate: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}
+
+export interface Message {
+  id: string;
+  reservationId: string;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  receiverName: string;
+  content: string;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+// Update FoodListing to include coordinates
+export interface FoodListing {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  quantity: string;
+  expirationDate: string;
+  address: string;
+  coordinates?: Coordinates;
+  image?: string;
+  dietaryTags?: string[];
+  userId: string;
+  userName: string;
+  createdAt: string;
+  status: 'available' | 'reserved' | 'completed';
+  totalPortions?: number;
+  availablePortions?: number;
+  portionSize?: string;
+}
+
+// Update Reservation to include providerId and providerName
 export interface Reservation {
   id: string;
   listingId: string;
@@ -33,19 +78,12 @@ export interface Reservation {
   listingImage?: string;
   reservedBy: string;
   reservedByName: string;
+  providerId?: string;
+  providerName: string;
   portionsReserved: number;
   reservationDate: string;
   pickupAddress: string;
   expirationDate: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  providerName: string;
   category: string;
-}
-
-export interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, name: string, type: User['type']) => Promise<boolean>;
-  logout: () => void;
-  isLoading: boolean;
 }
