@@ -85,6 +85,7 @@ const PublicarComida = () => {
         availablePortions: formData.totalPortions ? parseInt(formData.totalPortions) : undefined,
         expirationDate: formData.expirationDate,
         address: formData.address,
+        coordinates: { lat: -33.4489, lng: -70.6693 }, // Default Santiago coordinates
         image: selectedImage || undefined,
         dietaryTags: dietaryTags.length > 0 ? dietaryTags : undefined,
         userId: user.id,

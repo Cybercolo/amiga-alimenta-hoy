@@ -1,8 +1,9 @@
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  type: 'user' | 'business';
+  type: 'user' | 'business' | 'individual' | 'ngo';
 }
 
 export interface FoodListing {
@@ -19,7 +20,7 @@ export interface FoodListing {
   userId: string;
   userName: string;
   createdAt: string;
-  status: 'available' | 'reserved' | 'expired';
+  status: 'available' | 'reserved' | 'expired' | 'completed';
   totalPortions?: number;
   availablePortions?: number;
   portionSize?: string;
@@ -30,7 +31,7 @@ export interface Reservation {
   listingId: string;
   listingTitle: string;
   listingImage?: string;
-  listingAddress: string; // Added this property
+  listingAddress: string;
   reservedBy: string;
   reservedByName: string;
   providerId?: string;
@@ -41,7 +42,7 @@ export interface Reservation {
   expirationDate: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   category: string;
-  createdAt: string; // Added this property
+  createdAt: string;
 }
 
 export interface Message {
@@ -58,6 +59,8 @@ export interface Message {
 
 export interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string, name: string, type: User['type']) => Promise<boolean>;
   logout: () => void;
+  isLoading: boolean;
 }
