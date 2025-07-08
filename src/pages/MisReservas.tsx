@@ -2,14 +2,19 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
-import { Reservation } from '@/types';
-import { MapPin, Calendar, User, Package, Clock, CheckCircle } from 'lucide-react';
+import { Reservation, Message } from '@/types';
+import { MapPin, Calendar, User, Package, Clock, CheckCircle, MessageCircle, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const MisReservas = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -82,6 +87,35 @@ const MisReservas = () => {
     const completed = reservations.filter(r => r.status === 'completed').length;
     
     return { pending, confirmed, completed, total: reservations.length };
+  };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || !selectedReservation) return;
+
+    const message: Message = {
+      id: Date.now().toString(),
+      reservationId: selectedReservation.id,
+      senderId: user!.id,
+      senderName: user!.name,
+      receiverId: selectedReservation.providerId || '',
+      receiverName: selectedReservation.providerName,
+      content: newMessage,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    const storedMessages = JSON.parse(localStorage.getItem('niunamiga_messages') || '[]');
+    storedMessages.push(message);
+    localStorage.setItem('niunamiga_messages', JSON.stringify(storedMessages));
+
+    setNewMessage('');
+    setIsMessageDialogOpen(false);
+    setSelectedReservation(null);
+
+    toast({
+      title: "Mensaje enviado",
+      description: `Tu mensaje fue enviado a ${selectedReservation.providerName}`,
+    });
   };
 
   const stats = getStats();
@@ -224,15 +258,70 @@ const MisReservas = () => {
                         </div>
                       )}
 
-                      {reservation.status === 'confirmed' && (
-                        <Button 
-                          className="w-full bg-green-600 hover:bg-green-700 mt-4"
-                          onClick={() => handleMarkCompleted(reservation.id)}
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Marcar como Recogido
-                        </Button>
-                      )}
+                      <div className="flex gap-2 mt-4">
+                        <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 border-green-300 hover:bg-green-50"
+                              onClick={() => setSelectedReservation(reservation)}
+                            >
+                              <MessageCircle className="w-4 h-4 mr-2" />
+                              Enviar Mensaje
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Enviar mensaje a {selectedReservation?.providerName}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <p className="text-sm text-gray-600 mb-2">
+                                  Sobre: {selectedReservation?.listingTitle}
+                                </p>
+                                <Textarea
+                                  placeholder="Escribe tu mensaje aquí..."
+                                  value={newMessage}
+                                  onChange={(e) => setNewMessage(e.target.value)}
+                                  className="min-h-[100px] border-green-200 focus:border-green-500"
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <Button 
+                                  onClick={handleSendMessage}
+                                  disabled={!newMessage.trim()}
+                                  className="bg-green-600 hover:bg-green-700"
+                                >
+                                  <Send className="w-4 h-4 mr-2" />
+                                  Enviar
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  onClick={() => {
+                                    setIsMessageDialogOpen(false);
+                                    setNewMessage('');
+                                    setSelectedReservation(null);
+                                  }}
+                                >
+                                  Cancelar
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+
+                        {reservation.status === 'confirmed' && (
+                          <Button 
+                            size="sm"
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                            onClick={() => handleMarkCompleted(reservation.id)}
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Marcar Recogido
+                          </Button>
+                        )}
+                      </div>
 
                       {reservation.status === 'completed' && (
                         <div className="bg-green-50 p-3 rounded-lg text-center">

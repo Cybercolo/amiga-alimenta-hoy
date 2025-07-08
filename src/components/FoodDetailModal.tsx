@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FoodListing, Reservation } from '@/types';
+import { FoodListing, Reservation, Message } from '@/types';
 import { MapPin, Calendar, User, Image, Send, Package } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,21 +89,42 @@ const FoodDetailModal = ({ listing, isOpen, onClose }: FoodDetailModalProps) => 
       listingId: listing.id,
       listingTitle: listing.title,
       listingImage: listing.image,
+      listingAddress: listing.address,
       reservedBy: user!.id,
       reservedByName: user!.name,
+      providerId: listing.userId,
+      providerName: listing.userName,
       portionsReserved: portionsToReserve,
       reservationDate: new Date().toISOString(),
       pickupAddress: listing.address,
       expirationDate: listing.expirationDate,
       status: 'pending',
-      providerName: listing.userName,
-      category: listing.category
+      category: listing.category,
+      createdAt: new Date().toISOString()
     };
 
     // Guardar reserva
     const storedReservations = JSON.parse(localStorage.getItem('niunamiga_reservations') || '[]');
     storedReservations.push(newReservation);
     localStorage.setItem('niunamiga_reservations', JSON.stringify(storedReservations));
+
+    // Crear mensaje inmediatamente
+    const newMessage: Message = {
+      id: (Date.now() + 1).toString(), // +1 para evitar conflicto con ID de reserva
+      reservationId: newReservation.id,
+      senderId: user!.id,
+      senderName: user!.name,
+      receiverId: listing.userId,
+      receiverName: listing.userName,
+      content: message,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    // Guardar mensaje
+    const storedMessages = JSON.parse(localStorage.getItem('niunamiga_messages') || '[]');
+    storedMessages.push(newMessage);
+    localStorage.setItem('niunamiga_messages', JSON.stringify(storedMessages));
 
     // Actualizar las porciones disponibles del listing
     const storedListings = JSON.parse(localStorage.getItem('niunamiga_listings') || '[]');
@@ -125,7 +146,7 @@ const FoodDetailModal = ({ listing, isOpen, onClose }: FoodDetailModalProps) => 
     
     toast({
       title: "¡Reserva realizada!",
-      description: `Has reservado ${portionsToReserve} porción(es). Contacta a ${listing.userName} para coordinar la recogida.`,
+      description: `Has reservado ${portionsToReserve} porción(es). Tu mensaje fue enviado a ${listing.userName}.`,
     });
   };
 
