@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,7 @@ const MisReservas = () => {
       return;
     }
 
-    if (user.type !== 'individual') {
+    if (user.type !== 'user') {
       navigate('/feed');
       return;
     }
@@ -87,7 +86,7 @@ const MisReservas = () => {
 
   const stats = getStats();
 
-  if (!user || user.type !== 'individual') {
+  if (!user || user.type !== 'user') {
     return null;
   }
 
