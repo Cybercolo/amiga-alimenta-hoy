@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,6 @@ const PublicarComida = () => {
     title: '',
     description: '',
     category: '',
-    quantity: '',
     totalPortions: '',
     portionSize: 'normal',
     expirationDate: '',
@@ -62,7 +60,7 @@ const PublicarComida = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.description || !formData.category || !formData.quantity || !formData.expirationDate || !formData.address) {
+    if (!formData.title || !formData.description || !formData.category || !formData.expirationDate || !formData.address) {
       toast({
         title: "Error",
         description: "Por favor completa todos los campos obligatorios",
@@ -82,7 +80,7 @@ const PublicarComida = () => {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        quantity: formData.quantity,
+        quantity: formData.totalPortions ? `${formData.totalPortions} porciones` : 'No especificado',
         totalPortions: formData.totalPortions ? parseInt(formData.totalPortions) : undefined,
         availablePortions: formData.totalPortions ? parseInt(formData.totalPortions) : undefined,
         expirationDate: formData.expirationDate,
@@ -177,37 +175,23 @@ const PublicarComida = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category">Categoría *</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                    <SelectTrigger className="border-green-200 focus:border-green-500">
-                      <SelectValue placeholder="Selecciona categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="quantity">Cantidad *</Label>
-                  <Input
-                    id="quantity"
-                    value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    placeholder="ej. 2 kg, 5 porciones"
-                    required
-                    className="border-green-200 focus:border-green-500"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Categoría *</Label>
+                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <SelectTrigger className="border-green-200 focus:border-green-500">
+                    <SelectValue placeholder="Selecciona categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* New portion management section */}
+              {/* Portion management section */}
               <div className="bg-green-50 p-4 rounded-lg space-y-4">
                 <div className="flex items-center space-x-2 mb-3">
                   <Users className="w-5 h-5 text-green-600" />

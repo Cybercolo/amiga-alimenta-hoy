@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Home, Apple, Plus, Calendar, User, MessageCircle, Building2, LogOut } from 'lucide-react';
+import { Apple, Plus, Calendar, User, MessageCircle, Building2, LogOut } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -27,9 +28,8 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { name: 'Inicio', path: '/', icon: Home },
     ...(user ? [
-      { name: 'Comida', path: '/feed', icon: Apple },
+      { name: 'Comida Disponible', path: '/feed', icon: Apple },
       { name: 'Publicar', path: '/publicar', icon: Plus },
       { name: 'Mis Reservas', path: '/mis-reservas', icon: Calendar },
       { name: 'Mensajes', path: '/mensajes', icon: MessageCircle },
@@ -41,7 +41,7 @@ const Navbar = () => {
     <nav className="bg-green-100 border-b border-green-200 py-2 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo and Brand */}
-        <Link to="/" className="flex items-center text-green-800 font-bold text-lg">
+        <Link to={user ? "/feed" : "/"} className="flex items-center text-green-800 font-bold text-lg">
           <img src="/logo-ni-una-miga.png" alt="Ni Una Miga Logo" className="h-8 w-auto mr-2" />
           Ni Una Miga
         </Link>
