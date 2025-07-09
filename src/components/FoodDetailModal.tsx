@@ -315,16 +315,6 @@ const FoodDetailModal = ({ listing, isOpen, onClose }: FoodDetailModalProps) => 
                       <p className="text-green-700 mb-4">
                         Tu solicitud de reserva ha sido enviada a {listing.userName}. Te responderá pronto para coordinar la recogida.
                       </p>
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          setMessageSent(false);
-                          setShowContact(false);
-                        }}
-                        className="border-green-300 hover:bg-green-50"
-                      >
-                        Enviar otro mensaje
-                      </Button>
                     </div>
                   )}
                 </div>
