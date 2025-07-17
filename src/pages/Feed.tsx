@@ -100,7 +100,10 @@ const Feed = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    let filtered = listings.filter(listing => listing.status === 'available');
+    // Filter out current user's own listings and only show available ones
+    let filtered = listings.filter(listing => 
+      listing.status === 'available' && listing.userId !== user?.id
+    );
 
     if (searchTerm) {
       filtered = filtered.filter(listing =>
@@ -115,7 +118,7 @@ const Feed = () => {
     }
 
     setFilteredListings(filtered);
-  }, [listings, searchTerm, categoryFilter]);
+  }, [listings, searchTerm, categoryFilter, user?.id]);
 
   const categories = [
     'Frutas y Verduras',

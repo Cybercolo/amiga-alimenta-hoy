@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Feed from './pages/Feed';
 import PublicarComida from './pages/PublicarComida';
 import MisReservas from './pages/MisReservas';
+import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import DashboardEmpresas from './pages/DashboardEmpresas';
@@ -26,6 +27,7 @@ function App() {
               <Route path="/feed" element={<Feed />} />
               <Route path="/publicar" element={<PublicarComida />} />
               <Route path="/mis-reservas" element={<MisReservas />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard-empresas" element={<DashboardEmpresas />} />
