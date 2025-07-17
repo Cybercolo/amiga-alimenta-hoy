@@ -9,7 +9,6 @@ import { FoodListing } from '@/types';
 import { MapPin, Calendar, User, Search, Filter, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FoodDetailModal from '@/components/FoodDetailModal';
-import MapView from '@/components/MapView';
 import GoogleMapView from '@/components/GoogleMapView';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -212,10 +211,9 @@ const Feed = () => {
 
           {/* Tabs for List/Map view */}
           <Tabs defaultValue="list" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="list">Vista Lista</TabsTrigger>
               <TabsTrigger value="google-map">Mapa Interactivo</TabsTrigger>
-              <TabsTrigger value="mapbox">Mapa Mapbox</TabsTrigger>
             </TabsList>
 
             <TabsContent value="list" className="space-y-6">
@@ -366,16 +364,6 @@ const Feed = () => {
 
             <TabsContent value="google-map">
               <GoogleMapView 
-                listings={filteredListings} 
-                onListingSelect={(listing) => {
-                  setSelectedListing(listing);
-                  setIsModalOpen(true);
-                }}
-              />
-            </TabsContent>
-
-            <TabsContent value="mapbox">
-              <MapView 
                 listings={filteredListings} 
                 onListingSelect={(listing) => {
                   setSelectedListing(listing);
